@@ -1,0 +1,151 @@
+services:
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm
+    ports:
+      - "80:80"
+      - "81:81"     # Admin UI
+      - "443:443"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    restart: unless-stopped
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    environment:
+      TZ: 'Europe/Stockholm'
+      FTLCONF_webserver_api_password: '3256774'
+    volumes:
+      - './etc-pihole:/etc/pihole'
+      - './etc-dnsmasq.d:/etc/dnsmasq.d'
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8080:80"     # Web UI
+    restart: unless-stopped
+
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - AUTO_UPDATE=true #optional
+      - RUN_OPTS= #optional
+    volumes:
+      - ./config/jackett:/config
+      - /mnt/downloads:/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    volumes:
+      - ./config/sonarr:/config
+      - /mnt/media:/media
+      - /mnt/downloads:/downloads
+    ports:
+      - "8989:8989"
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    volumes:
+      - ./config/radarr:/config
+      - /mnt/media:/media
+      - /mnt/downloads:/downloads
+    ports:
+      - "7878:7878"
+    restart: unless-stopped
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    volumes:
+      - ./config/lidarr:/config
+      - /mnt/media:/media
+      - /mnt/downloads:/downloads
+    ports:
+      - "8686:8686"
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    volumes:
+      - ./config/prowlarr:/config
+    ports:
+      - "9696:9696"
+    restart: unless-stopped
+
+  tdarr:
+    image: haveagitgat/tdarr:latest
+    container_name: tdarr
+    environment:
+      - PUID=1000           # Your user ID
+      - PGID=1000           # Your group ID
+      - TZ=Europe/Stockholm # Your timezone
+    volumes:
+      - /path/to/config:/app/config   # Tdarr config files
+      - /path/to/media:/media         # Your media library (read/write)
+      - /path/to/cache:/app/cache     # Cache folder (optional)
+    ports:
+      - "8265:8265"  # Tdarr web UI port
+      - "8266:8266"  # Tdarr Node (worker) port, same host if running nodes separately
+    restart: unless-stopped
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+      - USER=youruser
+      - PASS=yourpassword
+    volumes:
+      - ./config/transmission:/config
+      - /mnt/downloads:/downloads
+      - /mnt/media:/media
+    ports:
+      - "9091:9091"         # Web UI
+      - "51413:51413"       # Torrent port
+      - "51413:51413/udp"
+    restart: unless-stopped
+
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:latest
+    container_name: lazylibrarian
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DOCKER_MODS=linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg #optional
+    volumes:
+      - ./config/lazylibrarian:/config
+      - /mnt/downloads/:/downloads
+    ports:
+      - 5299:5299
+    restart: unless-stopped
