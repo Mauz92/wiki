@@ -68,3 +68,14 @@ Restart and double check that the drive is mounted
 ```
 scp <path> <user@ip:path>
 ```
+
+# Changing hostname of Alpine VM
+Run the command below
+```
+echo <new_hostname> > /etc/hostname
+```
+And make it active with
+```
+hostname -F /etc/hostname
+```
+Then reboot
