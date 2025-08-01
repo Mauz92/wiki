@@ -1,4 +1,4 @@
-# Running Alpine with Docker
+# Running Docker in Alpine VM
 Make sure that community packages are enabled by going uncommenting this line in /etc/apk/repositories
 ```
 http://dl-cdn.alpinelinux.org/alpine/v3.22/community
@@ -19,7 +19,7 @@ rc-update add docker default
 ```
 
 
-# Mounting SMB share in Alpine
+# Mounting SMB share in Alpine VM
 First install CIFS Utils
 ```
 apk add cifs-utils
@@ -33,3 +33,4 @@ Run netmount command to make sure it is mounted on boot
 ```
 rc-update add netmount default
 ```
+Restart and double check that the drive is mounted
