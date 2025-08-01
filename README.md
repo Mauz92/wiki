@@ -65,4 +65,6 @@ rc-update add netmount default
 Restart and double check that the drive is mounted
 
 # Transfer files from main pc to VM
+```
 scp <path> <user@ip:path>
+```
