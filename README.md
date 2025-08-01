@@ -53,9 +53,9 @@ First install CIFS Utils
 ```
 apk add cifs-utils
 ```
-Add entry(ies) to /etc/fstab
+Add entry(ies) to /etc/fstab, make sure to point to /mnt on both host and guest
 ```
-//192.168.1.188/photos /mnt/nasaret/photos cifs username=superduperuser,password=supersecretpassword,uid=1000,gid=1000,vers=3.0,rw,sec=ntlmssp 0 0
+//192.168.x.x/share /mnt/nasaret/photos cifs username=superduperuser,password=supersecretpassword,uid=1000,gid=1000,vers=3.0,rw,sec=ntlmssp 0 0
 ```
 
 Run netmount command to make sure it is mounted on boot
