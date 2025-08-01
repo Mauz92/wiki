@@ -43,6 +43,10 @@ Save and make sure the script is executable
 chmod +x /etc/local.d/docker_compose.start
 ```
 
+Enable local boot service
+```
+rc-update add local
+```
 
 # Mounting SMB share in Alpine VM
 First install CIFS Utils
