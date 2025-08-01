@@ -1,4 +1,5 @@
 # Running Docker in Alpine VM
+## Installing Docker & Docker compose
 Make sure that community packages are enabled by going uncommenting this line in /etc/apk/repositories
 ```
 http://dl-cdn.alpinelinux.org/alpine/v3.22/community
@@ -16,6 +17,30 @@ apk add docker docker-compose
 Start and Enable docker service at boot
 ```
 rc-update add docker default
+```
+
+## Running docker compose on boot
+Create a script in local.d
+```
+nano /etc/local.d/docker_compose.start
+```
+
+With this content
+```
+#!/bin/sh
+# Wait a bit to make sure Docker is ready
+sleep 10
+
+# Change to the directory where your docker-compose.yml file is
+cd /path/to/your/compose
+
+# Start the containers
+docker-compose up -d
+```
+
+Save and make sure the script is executable
+```
+chmod +x /etc/local.d/docker_compose.start
 ```
 
 
