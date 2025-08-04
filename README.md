@@ -88,3 +88,16 @@ And make it active with
 hostname -F /etc/hostname
 ```
 Then reboot
+
+# Installing Tailscale
+Install curl
+```
+apk add curl
+```
+
+Fetch Tailscale install script
+```
+curl -fsSL https://tailscale.com/install.sh | sh
+tailscale up
+```
+Follow the on screen instructions from the console.
