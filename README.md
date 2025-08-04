@@ -47,6 +47,15 @@ Enable local boot service
 ```
 rc-update add local
 ```
+# Mounting NFS share in Alpine VM (Preferred over SMB)
+First install nfs utils
+```
+apk add nfs-utils
+```
+Add entry(ies) to /etc/fstab
+```
+192.168.1.188:/volume2/downloads /mnt/downloads nfs nolock,_netdev 0 0
+```
 
 # Mounting SMB share in Alpine VM
 First install CIFS Utils
