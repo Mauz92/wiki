@@ -85,22 +85,7 @@ services:
     ports:
       - 9696:9696
     restart: unless-stopped
-
-  lazylibrarian:
-    image: lscr.io/linuxserver/lazylibrarian:latest
-    container_name: lazylibrarian
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - DOCKER_MODS=linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg #optional
-    volumes:
-      - ./config/lazylibrarian:/config
-      - /mnt/downloads/:/downloads
-    ports:
-      - 5299:5299
-    restart: unless-stopped
-
+    
   readarr:
     container_name: readarr
     image: ghcr.io/hotio/readarr
