@@ -3,9 +3,9 @@ services:
     image: jc21/nginx-proxy-manager:latest
     container_name: npm
     ports:
-      - "80:80"
-      - "81:81"     # Admin UI
-      - "443:443"
+      - 80:80
+      - 81:81     # Admin UI
+      - 443:443
     volumes:
       - ./data:/data
       - ./letsencrypt:/etc/letsencrypt
@@ -17,29 +17,18 @@ services:
     environment:
       TZ: 'Europe/Stockholm'
       FTLCONF_webserver_api_password: '3256774'
+      FTLCONF_dns_listeningMode: 'all'
     volumes:
-      - './etc-pihole:/etc/pihole'
-      - './etc-dnsmasq.d:/etc/dnsmasq.d'
+      - ./etc-pihole:/etc/pihole
+      - ./etc-dnsmasq.d:/etc/dnsmasq.d
+    cap_add:
+      - NET_ADMIN
+      - SYS_TIME
+      - SYS_NICE
     ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "8080:80"     # Web UI
-    restart: unless-stopped
-
-  jackett:
-    image: lscr.io/linuxserver/jackett:latest
-    container_name: jackett
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - AUTO_UPDATE=true #optional
-      - RUN_OPTS= #optional
-    volumes:
-      - ./config/jackett:/config
-      - /mnt/downloads:/downloads
-    ports:
-      - 9117:9117
+      - 53:53/tcp
+      - 53:53/udp
+      - 8080:80     # Web UI
     restart: unless-stopped
 
   sonarr:
@@ -51,10 +40,9 @@ services:
       - TZ=Europe/Stockholm
     volumes:
       - ./config/sonarr:/config
-      - /mnt/media:/media
       - /mnt/downloads:/downloads
     ports:
-      - "8989:8989"
+      - 8989:8989
     restart: unless-stopped
 
   radarr:
@@ -66,10 +54,9 @@ services:
       - TZ=Europe/Stockholm
     volumes:
       - ./config/radarr:/config
-      - /mnt/media:/media
       - /mnt/downloads:/downloads
     ports:
-      - "7878:7878"
+      - 7878:7878
     restart: unless-stopped
 
   lidarr:
@@ -81,10 +68,9 @@ services:
       - TZ=Europe/Stockholm
     volumes:
       - ./config/lidarr:/config
-      - /mnt/media:/media
       - /mnt/downloads:/downloads
     ports:
-      - "8686:8686"
+      - 8686:8686
     restart: unless-stopped
 
   prowlarr:
@@ -97,42 +83,7 @@ services:
     volumes:
       - ./config/prowlarr:/config
     ports:
-      - "9696:9696"
-    restart: unless-stopped
-
-  tdarr:
-    image: haveagitgat/tdarr:latest
-    container_name: tdarr
-    environment:
-      - PUID=1000           # Your user ID
-      - PGID=1000           # Your group ID
-      - TZ=Europe/Stockholm # Your timezone
-    volumes:
-      - /path/to/config:/app/config   # Tdarr config files
-      - /path/to/media:/media         # Your media library (read/write)
-      - /path/to/cache:/app/cache     # Cache folder (optional)
-    ports:
-      - "8265:8265"  # Tdarr web UI port
-      - "8266:8266"  # Tdarr Node (worker) port, same host if running nodes separately
-    restart: unless-stopped
-
-  transmission:
-    image: lscr.io/linuxserver/transmission:latest
-    container_name: transmission
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Stockholm
-      - USER=youruser
-      - PASS=yourpassword
-    volumes:
-      - ./config/transmission:/config
-      - /mnt/downloads:/downloads
-      - /mnt/media:/media
-    ports:
-      - "9091:9091"         # Web UI
-      - "51413:51413"       # Torrent port
-      - "51413:51413/udp"
+      - 9696:9696
     restart: unless-stopped
 
   lazylibrarian:
@@ -149,3 +100,78 @@ services:
     ports:
       - 5299:5299
     restart: unless-stopped
+
+  readarr:
+    container_name: readarr
+    image: ghcr.io/hotio/readarr
+    ports:
+      - 8787:8787
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=Europe/Stockholm
+    volumes:
+      - ./config/readarr:/config
+      - /mnt/downloads:/downloads
+
+  unpackerr:
+    image: golift/unpackerr
+    container_name: unpackerr
+    volumes:
+      - /mnt/downloads:/downloads
+    user: 1000:1000
+    environment:
+      - TZ=Europe/Stockholm
+      - UN_QUIET=false
+      - UN_DEBUG=false
+      - UN_ERROR_STDERR=false
+      - UN_LOG_QUEUES=1m
+      - UN_LOG_FILES=10
+      - UN_LOG_FILE_MB=10
+      - UN_INTERVAL=2m
+      - UN_START_DELAY=1m
+      - UN_RETRY_DELAY=5m
+      - UN_MAX_RETRIES=3
+      - UN_PARALLEL=1
+      - UN_FILE_MODE=0644
+      - UN_DIR_MODE=0755
+      - UN_ACTIVITY=false
+      # Radarr Config
+      - UN_RADARR_0_URL=http://192.168.1.101:7878
+      - UN_RADARR_0_API_KEY=fc254d69b2db4b0eb57a7acf0bfd513a
+      # Lidarr Config
+      - UN_LIDARR_0_URL=http://192.168.1.101:8686
+      - UN_LIDARR_0_API_KEY=43ac7eb9b8854e568c5afa80d906d8d6
+      # Folder Config
+      - UN_FOLDER_0_PATH=/downloads/extracted
+      - UN_FOLDER_0_DELETE_FILES=false
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - WEBUI_PORT=8081
+      - TORRENTING_PORT=6881
+    volumes:
+      - ./config/qbittorrent:/config
+      - /mnt/downloads:/downloads
+    ports:
+      - 8081:8081
+      - 53967:53967
+      - 53967:53967/udp
+    restart: unless-stopped
+
+  flaresolverr:
+    # DockerHub mirror flaresolverr/flaresolverr:latest
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - TZ=Europe/London
+    ports:
+      - 8191:8191
